@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class VPNServer {
     private static final int PORT = 8080;
@@ -15,10 +16,8 @@ public class VPNServer {
         try {
             // Generate AES key
             SecretKey secretKey = EncryptionUtil.generateKey();
-            String base64Key = EncryptionUtil.keyToBase64(secretKey);
+//            String base64Key = EncryptionUtil.keyToBase64(secretKey);
 
-            // Print key for the client to use
-            System.out.println("🔑 Share this key with the client: " + base64Key);
 
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("✅ VPN Server is running on port: " + PORT);
@@ -38,6 +37,9 @@ public class VPNServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
+            String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+            out.println(encodedKey);
+//            System.out.println("🔑 Share this key with the client: " + base64Key);
             String message;
             while ((message = in.readLine()) != null) {
                 String decryptedMessage = EncryptionUtil.decryptFromBase64(message, secretKey);

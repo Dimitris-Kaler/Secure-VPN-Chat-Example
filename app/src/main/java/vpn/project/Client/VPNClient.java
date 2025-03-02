@@ -3,20 +3,23 @@ package vpn.project.Client;
 import vpn.project.EncryptionUtil;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Base64;
 
 public class VPNClient {
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int PORT = 8080;
+    private static SecretKey secretKey;
 
     public static void main(String[] args) {
         try {
             // 🔴 Copy the key from the server output and paste it here
-            String base64Key = "PASTE_SERVER_KEY_HERE";
-            SecretKey secretKey = EncryptionUtil.keyFromBase64(base64Key);
+//            String base64Key = "yBkk7457fVVZRa/tRHEkBQ";
+//            SecretKey secretKey = EncryptionUtil.keyFromBase64(base64Key);
 
             Socket socket = new Socket(SERVER_ADDRESS, PORT);
             System.out.println("✅ Connected to VPN Server");
@@ -33,6 +36,11 @@ public class VPNClient {
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))
         ) {
+
+            String encodedKey = in.readLine();
+            byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+            secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+            System.out.println("🔑 Key received successfully!");
             while (true) {
                 System.out.print("💬 Enter message: ");
                 String userMessage = userInput.readLine();
